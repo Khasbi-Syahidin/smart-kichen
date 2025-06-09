@@ -2,26 +2,49 @@
 
     {{ $this->table }}
 
-    {{-- <div>
-        {{ $this->table() }}
-    </div> --}}
+    {{-- <div class="mt-6 space-y-4">
+        <input
+            type="text"
+            wire:model.debounce.500ms="rfidInput"
+            placeholder="Scan Kartu..."
+            class="text-black bg-yellow-200 p-2 rounded w-full"
+            id="rfidInput"
+            autocomplete="off"
+        />
 
-    {{-- Tempelkan ini di bagian paling atas dari blade Filament Page --}}
-    <div class="hidden">
-        <input wire:model.debounce.500ms="rfidInput" type="text" autofocus autocomplete="off" class="w-0 h-0 opacity-0">
+        <p>Input Masuk: {{ $rfidInput }}</p>
     </div>
 
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const rfidInput = document.querySelector('input[wire\\:model]');
-            rfidInput.focus();
+    <script>
+        document.addEventListener('livewire:load', () => {
+            const input = document.getElementById('rfidInput');
+            input?.focus();
 
+            // Fokus kembali jika user klik sembarang tempat
             document.addEventListener('click', () => {
-                rfidInput.focus();
+                input?.focus();
+            });
+
+            // Saat trigger dari backend
+            Livewire.on('refreshRfidFocus', () => {
+                input?.focus();
             });
         });
     </script> --}}
-
+    <script>
+        document.addEventListener('livewire:load', () => {
+            Livewire.on('reset-rfid', () => {
+                const input = document.getElementById('rfidInputField');
+                if (input) {
+                    input.value = '';
+                    input.dispatchEvent(new Event('input', {
+                        bubbles: true
+                    })); // sinkronisasi ke Livewire
+                    input.focus();
+                }
+            });
+        });
+    </script>
 
 
 </x-filament-panels::page>

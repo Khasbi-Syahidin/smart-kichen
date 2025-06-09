@@ -49,6 +49,18 @@ class ScheduleResource extends Resource
                         'required' => 'Harap pilih hari terlebih dahulu.',
                     ])
                     ->native(false),
+                    Forms\Components\CheckboxList::make('sessions')
+                    ->label('Sesi Makan')
+                    ->options([
+                        'breakfast' => 'Sarapan Pagi',
+                        'lunch' => 'Makan Siang',
+                        'dinner' => 'Makan Malam',
+                    ])
+                    ->columns(3) // tampil horizontal
+                    ->required()
+                    ->validationMessages([
+                        'required' => 'Minimal satu sesi makan harus dipilih.',
+                    ]),
 
                 Forms\Components\Select::make('supervisor_id')
                     ->label('Pengawas')

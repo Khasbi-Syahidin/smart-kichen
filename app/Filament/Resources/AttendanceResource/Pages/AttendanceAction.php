@@ -8,6 +8,7 @@ use App\Models\AttendanceSession;
 use App\Models\Consumer;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\Page;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -16,6 +17,8 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\HtmlString;
+use Filament\Support\Exceptions\Halt;
 
 class AttendanceAction extends Page implements HasTable
 {
@@ -88,6 +91,14 @@ class AttendanceAction extends Page implements HasTable
                     }
                 })
                 ->color('primary'),
+            // Action::make('absen-rfid')
+            //     ->label('Absensi RFID')
+            //     ->url(fn($record) => route(
+            //         'filament.admin.resources.attendances.atendance_rfid',
+            //         ['record' => $this->attendanceSessionId]
+            //     ))
+            //     ->outlined()
+            //     ->color('primary'),
 
             Action::make('back')
                 ->label('Akhiri Absensi')
@@ -95,17 +106,17 @@ class AttendanceAction extends Page implements HasTable
         ];
     }
 
-    protected function getHeaderWidgets(): array
-    {
-        return [
-            \App\Filament\Resources\AttendanceResource\Widgets\AttendanceOverview::class,
-        ];
-    }
+    // protected function getHeaderWidgets(): array
+    // {
+    //     return [
+    //         \App\Filament\Resources\AttendanceResource\Widgets\AttendanceOverview::class,
+    //     ];
+    // }
 
-    public function getHeaderWidgetsColumns(): int | array
-    {
-        return 3;
-    }
+    // public function getHeaderWidgetsColumns(): int | array
+    // {
+    //     return 3;
+    // }
 
     protected function getDefaultTableFilters(): array
     {
@@ -160,56 +171,20 @@ class AttendanceAction extends Page implements HasTable
                             });
                         }
                     }),
+
             ])
+
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make(),
+                // ]),
             ]);
     }
 
-
-
-
-    public string $rfidInput = '';
-
-    public function updatedRfidInput($value)
+    public static function getPages(): array
     {
-        $sessionId = $this->attendanceSessionId;
-
-        $consumer = Consumer::where('rfid', $value)->first();
-
-        if (!$consumer) {
-            Notification::make()
-                ->title("RFID tidak ditemukan.")
-                ->danger()
-                ->send();
-
-            return;
-        }
-
-        $alreadyExists = AttendanceConsumer::where('attendance_session_id', $sessionId)
-            ->where('consumer_id', $consumer->id)
-            ->exists();
-
-        if ($alreadyExists) {
-            Notification::make()
-                ->title("{$consumer->name} sudah absen.")
-                ->warning()
-                ->send();
-        } else {
-            AttendanceConsumer::create([
-                'attendance_session_id' => $sessionId,
-                'consumer_id' => $consumer->id,
-            ]);
-
-            Notification::make()
-                ->title("Absensi berhasil untuk {$consumer->name}.")
-                ->success()
-                ->send();
-        }
-
-        // Reset untuk menerima input berikutnya
-        $this->rfidInput = '';
+        return [
+            'atendance_rfid' => AttendanceRfid::route('/attendance_rfid'),
+        ];
     }
 }

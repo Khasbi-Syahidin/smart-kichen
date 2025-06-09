@@ -124,6 +124,9 @@ class AttendanceResource extends Resource
                 Tables\Columns\TextColumn::make('menu.name')
                     ->label('Menu Makanan')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('consumers_count')
+                    ->label('Jumlah Consumer')
+                    ->counts('consumers'),
                 Tables\Columns\TextColumn::make('supervisor.name')
                     ->label('Pengawas')
                     ->searchable(),
@@ -148,11 +151,27 @@ class AttendanceResource extends Resource
 
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('tap')
-                        ->label('Lakukan Absensi')
+                    Tables\Actions\Action::make('read-consumer')
+                        ->label('Lihat Consumer Absensi')
                         ->icon('heroicon-o-tag')
                         ->url(fn($record) => route(
                             'filament.admin.resources.attendances.detail_attendance',
+                            ['record' => $record->id]
+                        ))
+                        ->openUrlInNewTab(false),
+                    Tables\Actions\Action::make('tap-rfid')
+                        ->label('Lakukan Absensi RFID')
+                        ->icon('heroicon-o-credit-card')
+                        ->url(fn($record) => route(
+                            'filament.admin.resources.attendances.atendance_rfid',
+                            ['record' => $record->id]
+                        ))
+                        ->openUrlInNewTab(false),
+                    Tables\Actions\Action::make('qr')
+                        ->label('Lakukan Absensi QR')
+                        ->icon('heroicon-o-qr-code')
+                        ->url(fn($record) => route(
+                            'filament.admin.resources.attendances.atendance_camera',
                             ['record' => $record->id]
                         ))
                         ->openUrlInNewTab(false),
@@ -226,6 +245,8 @@ class AttendanceResource extends Resource
         return [
             'index' => Pages\ManageAttendances::route('/'),
             'detail_attendance' => Pages\AttendanceAction::route('/detail_attendance'),
+            'atendance_rfid' => Pages\AttendanceRfid::route('/attendance_rfid'),
+            'atendance_camera' => Pages\AttendanceCamera::route('/attendance_camera'),
         ];
     }
 }

@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\HtmlString;
 use Filament\Forms\Components\Hidden;
+use Filament\Notifications\Notification;
 
 class ConsumerResource extends Resource
 {
@@ -38,6 +39,7 @@ class ConsumerResource extends Resource
                 Forms\Components\TextInput::make('rfid'),
                 Forms\Components\Toggle::make('is_active')
                     ->label('Aktif')
+                    ->default(true),
             ]);
     }
 
@@ -52,6 +54,8 @@ class ConsumerResource extends Resource
                     ->getStateUsing(fn($record) => $record->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($record->name)),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('rfid')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('is_active')
                     ->badge()
@@ -68,7 +72,7 @@ class ConsumerResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ActionGroup::make([
+                // Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\Action::make('add-rfid')
                         ->label('Tambah RFID')
@@ -79,8 +83,11 @@ class ConsumerResource extends Resource
                                 ->required()
                                 ->rules(['min:10', 'max:10'])
                                 ->default($record->rfid)
-                                ->extraAttributes(['autofocus' => true])
-
+                                ->extraAttributes([
+                                    'readonly' => true,
+                                    'autofocus' => true,
+                                    'class' => 'absolute opacity-0 -z-10 pointer-events-none',
+                                ])
                         ])
                         ->modalHeading('Tambah RFID')
                         ->modalWidth('md')
@@ -88,15 +95,27 @@ class ConsumerResource extends Resource
                         ->modalCancelActionLabel('Tutup')
                         ->modalDescription(new HtmlString(view('components.rfid-instruction')->render()))
                         ->action(function (array $data, $record) {
+                            if (!is_numeric($data['rfid']) || strlen($data['rfid']) !== 10) {
+                                Notification::make()
+                                    ->title('RFID tidak valid')
+                                    ->danger()
+                                    ->send();
+                                return;
+                            }
+
                             $record->update([
                                 'rfid' => $data['rfid'],
                             ]);
+
+                            Notification::make()
+                                ->title('RFID berhasil disimpan')
+                                ->success()
+                                ->send();
                         })
-                        ->modalButton('Simpan')
                         ->color('primary'),
 
                     Tables\Actions\DeleteAction::make(),
-                ])
+                // ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

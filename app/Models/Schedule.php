@@ -9,11 +9,15 @@ class Schedule extends Model
     //
 
     // add fillable
-    protected $fillable = ['day'];
+    protected $fillable = ['day', 'sessions'];
     // add guaded
     protected $guarded = ['id'];
     // add hidden
     protected $hidden = ['created_at', 'updated_at'];
+
+    protected $casts = [
+        'sessions' => 'array',
+    ];
 
     public function users()
     {

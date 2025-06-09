@@ -29,7 +29,7 @@ class MenuResource extends Resource
                     ->directory('menus')
                     ->label('Foto Menu')
                     ->columnSpan(2),
-                    Forms\Components\TextInput::make('name')
+                Forms\Components\TextInput::make('name')
                     ->required()
                     ->label('Nama Menu')
                     ->minLength(2)
@@ -52,6 +52,9 @@ class MenuResource extends Resource
                     ->label('Nama
                      Menu')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('attendance_sessions_count')
+                    ->label('Jumlah Sesi Makan')
+                    ->counts('attendanceSessions'),
             ])
             ->filters([
                 //
