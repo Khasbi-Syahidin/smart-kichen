@@ -49,8 +49,14 @@ class ConsumerOverview extends BaseWidget
 
                 // Ambil ulang model Consumer untuk digunakan di table (agar compatible)
                 return Consumer::query()
-                ->whereIn('id', $sorted->pluck('id'))
-                ->orderByRaw("FIELD(id, {$sorted->pluck('id')->implode(',')})");
+                    ->when($sorted->isNotEmpty(), function ($query) use ($sorted) {
+                        return $query
+                            ->whereIn('id', $sorted->pluck('id'))
+                            ->orderByRaw("FIELD(id, {$sorted->pluck('id')->implode(',')})");
+                    }, function ($query) {
+                        // Jika kosong, pastikan tidak ada data ditampilkan untuk hindari error
+                        return $query->whereRaw('0 = 1');
+                    });
             })
             ->columns([
                 Tables\Columns\TextColumn::make('name')->label('Nama Consumer'),
