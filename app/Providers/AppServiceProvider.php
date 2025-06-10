@@ -20,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
         //
         parent::register();
         FilamentView::registerRenderHook('panels::body.end', fn(): string => Blade::render("@vite('resources/js/app.js')"));
+        if (config('app.env') === 'production') {
+            $this->app['request']->server->set('HTTPS', true);
+        }
     }
 
     /**
@@ -36,7 +39,11 @@ class AppServiceProvider extends ServiceProvider
             $event->extendSocialite('discord', \SocialiteProviders\Google\Provider::class);
         });
 
-        if (request()->header('x-forwarded-proto') === 'https' || request()->server('HTTPS') === 'on') {
+        // if (request()->header('x-forwarded-proto') === 'https' || request()->server('HTTPS') === 'on') {
+        //     URL::forceScheme('https');
+        // }
+
+        if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
     }
