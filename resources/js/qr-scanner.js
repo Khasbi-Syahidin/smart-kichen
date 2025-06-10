@@ -14,7 +14,7 @@ window.initQrScanner = function (elementId, onSuccessCallback) {
     );
 
 
-    scanner.render((decodedText, decodedResult) => {
+    html5QrcodeScanner.render((decodedText, decodedResult) => {
         if (isProcessing) return;
 
         isProcessing = true;
