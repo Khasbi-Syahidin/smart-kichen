@@ -108,7 +108,7 @@ class AttendanceCamera extends Page
 
         $this->consumer = $consumer;
         Notification::make()
-            ->title('{$consumer->name} berhasil absen')
+            ->title("{$consumer->name} berhasil absen")
             ->success()
             ->send();
         // $this->reset('rfid');
